@@ -1,0 +1,33 @@
+doctype html
+html
+  head
+    title Grid Display
+    link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css")
+  body
+    h1 #{title}
+
+    // Display query values as paragraph
+    p Query rows: #{query.rows}, Query cols: #{query.cols}
+
+    // Convert query strings to numbers
+    -
+      let rows = Number(query.rows);
+      let cols = Number(query.cols);
+
+    // Check if rows and cols are integers and within the valid range
+    if (!Number.isInteger(rows) || !Number.isInteger(cols))
+      p Invalid input: rows and cols must be integers.
+    else if (rows < 3 || rows > 13)
+      p Invalid input: rows must be between 3 and 13.
+    else if (cols < 3 || cols > 13)
+      p Invalid input: cols must be between 3 and 13.
+    else
+      // Create a table with the correct dimensions
+      table#outer.container-fluid
+        - for (let i = 0; i < rows; i++) {
+          tr#middle.row
+            - for (let j = 0; j < cols; j++) {
+              // Calculate cell value: row^2 + col
+              td.col-sm-1= i * i + j
+            - }
+        - }
