@@ -2,18 +2,17 @@
 var express = require('express');
 var router = express.Router();
 
-// Require controller modules
 var api_controller = require('../controllers/api');
-var gadget_controller = require('../controllers/gadget');
+var gadget_controller = require('../controllers/gadgets');
 
-// API ROUTE
+// API Route
 router.get('/', api_controller.api);
 
-// GADGET ROUTES
-router.post('/gadgets', gadget_controller.gadget_create_post);
-router.delete('/gadgets/:id', gadget_controller.gadget_delete);
-router.put('/gadgets/:id', gadget_controller.gadget_update_put);
-router.get('/gadgets/:id', gadget_controller.gadget_detail);
-router.get('/gadgets', gadget_controller.gadget_list);
-router.get('/gadgets', gadget_controller.gadget_list);
+// Gadget Routes
+router.get('/gadgets', gadget_controller.gadget_list);  // List all gadgets
+router.post('/gadgets', gadget_controller.gadget_create_post); // Create new gadget
+router.get('/gadgets/:id', gadget_controller.gadget_detail); // View single gadget
+router.put('/gadgets/:id', gadget_controller.gadget_update_put); // Update gadget
+router.delete('/gadgets/:id', gadget_controller.gadget_delete); // Delete gadget
+
 module.exports = router;

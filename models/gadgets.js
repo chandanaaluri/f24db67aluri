@@ -1,9 +1,11 @@
-const mongoose = require("mongoose");
+// models/gadgets.js
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-const gadgetSchema = new mongoose.Schema({
-  gadget_name:String,
-  price:Number,
-  functionality:String
+var gadgetSchema = new Schema({
+  gadget_name: { type: String, required: true },
+  price: { type: Number, required: true },
+  functionality: { type: String, required: true }
 });
 
-module.exports = mongoose.model("Gadget", gadgetSchema);
+module.exports = mongoose.model('Gadget', gadgetSchema);

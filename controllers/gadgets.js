@@ -1,17 +1,15 @@
 // controllers/gadget.js
-var Gadget = require('../models/gadgets'); // Make sure you have a Gadget model
+const Gadget = require('../models/gadgets');
 
-// List of all Gadgets
-exports.gadget_list = async function(req, res) {
-    try {
-      // Fetch all documents from the Gadget collection
-      const gadgets = await Gadget.find();
-      res.json(gadgets); // Send the gadgets as a JSON response
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Failed to fetch gadgets" }); // Error handling
-    }
-  };
+// List all gadgets
+exports.gadget_list = async (req, res) => {
+  try {
+    const gadgets = await Gadget.find();
+    res.status(200).json(gadgets);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch gadgets' });
+  }
+};
 
 // Get a specific Gadget by ID
 exports.gadget_detail = function(req, res) {
@@ -22,20 +20,19 @@ exports.gadget_detail = function(req, res) {
 };
 
 // Create a new Gadget
-exports.gadget_create_post = async function(req, res) {
-    try {
-      const newGadget = new Gadget({
-        gadget_name: req.body.gadget_name,
-        price: req.body.price,
-        functionality: req.body.functionality
-      });
-  
-      await newGadget.save();
-      res.status(201).json({ message: 'Gadget created successfully', gadget: newGadget });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  };
+exports.gadget_create_post = async (req, res) => {
+  const newGadget = new Gadget({
+    gadget_name: req.body.gadget_name,
+    price: req.body.price,
+    functionality: req.body.functionality
+  });
+  try {
+    await newGadget.save();
+    res.status(201).json({ message: 'Gadget created successfully', gadget: newGadget });
+  } catch (err) {
+    res.status(400).json({ message: 'Failed to create gadget', error: err.message });
+  }
+};
 
 // Delete a Gadget by ID
 exports.gadget_delete = function(req, res) {
@@ -52,24 +49,3 @@ exports.gadget_update_put = function(req, res) {
     res.status(200).json(updatedGadget);
   });
 };
-
-// Create POST method to add new gadget
-exports.gadget_create_post = async function(req, res) {
-    try {
-      // Create a new gadget from the request body
-      const newGadget = new Gadget({
-        gadget_name: req.body.gadget_name,
-        price: req.body.price,
-        functionality: req.body.functionality
-      });
-  
-      // Save the new gadget to the database
-      await newGadget.save();
-  
-      // Return the created gadget as a response
-      res.status(201).json({ message: 'Gadget created successfully', gadget: newGadget });
-    } catch (err) {
-      // Handle errors (e.g., invalid data or server issues)
-      res.status(500).json({ error: err.message });
-    }
-  };
