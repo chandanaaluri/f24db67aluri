@@ -1,10 +1,9 @@
-const express = require('express');
-const router = express.Router();
+// In routes/gadgets.js
+var express = require('express');
+var router = express.Router();
+const gadget_controlers = require('../controllers/gadgets'); // Adjust the path as necessary
 
-// Define the GET route for gadgets
-router.get('/', (req, res) => {
-  // This should match the name of your Pug file in views
-  res.render('gadgets', { title: 'Search Results - Gadgets' });
-});
+// POST route to create a new gadget
+router.post('/', gadget_controlers.gadget_create_post);
 
 module.exports = router;
