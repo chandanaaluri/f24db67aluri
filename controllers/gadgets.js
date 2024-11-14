@@ -22,13 +22,20 @@ exports.gadget_detail = function(req, res) {
 };
 
 // Create a new Gadget
-exports.gadget_create_post = function(req, res) {
-  const gadget = new Gadget(req.body);
-  gadget.save(function(err, newGadget) {
-    if (err) return res.status(500).json({ message: "Error creating gadget" });
-    res.status(201).json(newGadget);
-  });
-};
+exports.gadget_create_post = async function(req, res) {
+    try {
+      const newGadget = new Gadget({
+        gadget_name: req.body.gadget_name,
+        price: req.body.price,
+        functionality: req.body.functionality
+      });
+  
+      await newGadget.save();
+      res.status(201).json({ message: 'Gadget created successfully', gadget: newGadget });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
 
 // Delete a Gadget by ID
 exports.gadget_delete = function(req, res) {
