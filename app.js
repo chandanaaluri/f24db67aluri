@@ -27,11 +27,17 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/grid', gridRouter);
 app.use('/selector', pickRouter);
+app.use(express.static('public'));  // This could affect route resolution
 
 var resourceRouter = require('./routes/resource'); // Ensure this path is correct
 
 app.use('/resource', resourceRouter);  // Route for all resource-related requests
 
+app.get('/gadgets', (req, res) => {
+  res.json({ message: 'Gadgets list' });
+  // Or, if you want to render an HTML page:
+  // res.render('gadgets');
+});
 // Static Gadget Route Example
 app.get('/gadgets', (req, res) => {
   const results = [
@@ -60,7 +66,8 @@ app.get('/resource/gadgets', async (req, res) => {
 });
 
 // POST Route for Creating Gadgets
-app.post('/resource/gadgets', async (req, res) => {
+// POST Route for Creating Gadgets (updated to /gadgets)
+app.post('/gadgets', async (req, res) => {
   try {
     const newGadget = new Gadget(req.body);
     await newGadget.save();
@@ -70,6 +77,7 @@ app.post('/resource/gadgets', async (req, res) => {
     res.status(400).json({ message: "Failed to create gadget" });
   }
 });
+
 
 // General Error Handling Route (for unknown routes)
 app.use(function(req, res, next) {
@@ -89,11 +97,9 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const connectionString = process.env.MONGO_CON;
 
-mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', function () {
-  console.log("Connection to DB succeeded");
-});
+mongoose.connect(connectionString)
+  .then(() => console.log("Connection to DB succeeded"))
+  .catch((error) => console.error("MongoDB connection error:", error));
+
 
 module.exports = app;
