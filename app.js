@@ -9,7 +9,6 @@ var usersRouter = require('./routes/users');
 const gridRouter = require('./routes/grid');
 const pickRouter = require('./routes/pick');
 const Gadget = require('./models/gadgets');
-const gadget_controller = require('./controllers/gadgets');  // Adjust according to your path
 
 var app = express();
 
@@ -22,8 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-router.get('/gadgets/:id', gadget_controller.gadget_detail);
-app.use('/', router);
+
 // Set up routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -35,17 +33,10 @@ var resourceRouter = require('./routes/resource'); // Ensure this path is correc
 
 app.use('/resource', resourceRouter);  // Route for all resource-related requests
 
-app.get('/gadgets', async (req, res) => {
-  try {
-    // Fetch all gadgets from the database
-    const gadgets = await Gadget.find();
-    // Return the gadgets list as JSON
-    res.status(200).json(gadgets);
-  } catch (err) {
-    // Handle any errors (e.g., database connection issues)
-    console.error(err);
-    res.status(500).json({ message: 'Failed to fetch gadgets' });
-  }
+app.get('/gadgets', (req, res) => {
+  res.json({ message: 'Gadgets list' });
+  // Or, if you want to render an HTML page:
+  // res.render('gadgets');
 });
 // Static Gadget Route Example
 app.get('/gadgets', (req, res) => {
@@ -75,8 +66,7 @@ app.get('/resource/gadgets', async (req, res) => {
 });
 
 // POST Route for Creating Gadgets
-// POST Route for Creating Gadgets (updated to /gadgets)
-app.post('/gadgets', async (req, res) => {
+app.post('/resource/gadgets', async (req, res) => {
   try {
     const newGadget = new Gadget(req.body);
     await newGadget.save();
@@ -86,7 +76,6 @@ app.post('/gadgets', async (req, res) => {
     res.status(400).json({ message: "Failed to create gadget" });
   }
 });
-
 
 // General Error Handling Route (for unknown routes)
 app.use(function(req, res, next) {
