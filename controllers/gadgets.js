@@ -55,29 +55,29 @@ exports.gadget_delete = function(req, res) {
 
 // Update a Gadget by ID
 // Controller for updating one gadget
+// Controller for updating a gadget
 exports.gadget_update = async function(req, res) {
-  console.log("Updating gadget with ID: " + req.params.id);
+  console.log(`Update on id ${req.params.id} with body ${JSON.stringify(req.body)}`);
+  
   try {
-    // Find the gadget by ID and update it
-    const gadget = await Gadget.findById(req.params.id);
+    // Find the gadget by ID
+    let toUpdate = await Gadget.findById(req.params.id);
 
-    if (!gadget) {
-      return res.status(404).json({ message: `Gadget with ID ${req.params.id} not found` });
-    }
+    // Update the properties if provided in the request body
+    if (req.body.gadget_name) toUpdate.gadget_name = req.body.gadget_name;
+    if (req.body.price) toUpdate.price = req.body.price;
+    if (req.body.functionality) toUpdate.functionality = req.body.functionality;
 
-    // Update the gadget fields from the request body
-    if (req.body.name) gadget.name = req.body.name;
-    if (req.body.brand) gadget.brand = req.body.brand;
-    if (req.body.memory) gadget.memory = req.body.memory;
-    if (req.body.price) gadget.price = req.body.price;
-    // Add more fields as needed
+    // Save the updated gadget document
+    let result = await toUpdate.save();
 
-    // Save the updated gadget
-    await gadget.save();
-    res.status(200).json({ message: `Gadget with ID ${req.params.id} updated`, gadget });
-  } catch (error) {
-    // Handle any errors during update
-    res.status(500).json({ message: `Error updating gadget with ID ${req.params.id}` });
+    // Return the updated document
+    console.log("Success " + result);
+    res.json(result); // Respond with the updated gadget
+  } catch (err) {
+    // Handle error if gadget is not found or update fails
+    res.status(500).send(`{"error": "${err.message}: Update for id ${req.params.id} failed"}`);
   }
 };
+
 
