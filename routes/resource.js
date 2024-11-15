@@ -15,5 +15,9 @@ router.get('/gadgets/:id', gadget_controller.gadget_detail); // View single gadg
 // PUT request to update a gadget by ID
 router.put('/gadgets/:id', gadget_controller.gadget_update);
 router.delete('/gadgets/:id', gadget_controller.gadget_delete); // Delete gadget
-
+router.post('/gadgets', function(req, res) {
+    // Handle post request for gadgets
+    // Your gadget creation logic goes here
+    res.send('Gadget created');
+  });
 module.exports = router;

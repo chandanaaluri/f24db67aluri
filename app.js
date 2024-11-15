@@ -50,16 +50,21 @@ app.get('/gadgets', async (req, res) => {
 });
 
 // Route to create gadgets (POST request to /resource/gadgets)
-app.post('/resource/gadgets', async (req, res) => {
-  try {
-    const newGadget = new Gadget(req.body);
-    await newGadget.save();
-    res.status(201).json({ message: 'Gadget created successfully', gadget: newGadget });
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ message: "Failed to create gadget" });
-  }
+// Route to create gadgets (POST request to /gadgets)
+app.post('/gadgets', (req, res) => {
+  const gadget = req.body;
+  console.log('Gadget received:', gadget);
+  
+  // Handle your logic here, for example, save to DB
+  // For now, send a response back:
+  res.status(201).json({ message: 'Gadget created successfully', gadget });
 });
+
+// Catch-all route to handle 404 errors
+app.use((req, res) => {
+  res.status(404).send('Page Not Found');
+});
+
 
 // General Error Handling Route (for unknown routes)
 app.use(function(req, res, next) {
