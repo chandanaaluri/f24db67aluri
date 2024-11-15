@@ -3,12 +3,12 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var Gadget = require('./models/gadgets'); // Import Gadget model
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const gridRouter = require('./routes/grid');
 const pickRouter = require('./routes/pick');
-const Gadget = require('./models/gadgets');
 
 var app = express();
 
@@ -27,45 +27,29 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/grid', gridRouter);
 app.use('/selector', pickRouter);
-app.use(express.static('public'));  // This could affect route resolution
 
-var resourceRouter = require('./routes/resource'); // Ensure this path is correct
+// MongoDB connection setup
+require('dotenv').config();
+const mongoose = require('mongoose');
+const connectionString = process.env.MONGO_CON;
 
-app.use('/resource', resourceRouter);  // Route for all resource-related requests
+mongoose.connect(connectionString)
+  .then(() => console.log("Connection to DB succeeded"))
+  .catch((error) => console.error("MongoDB connection error:", error));
 
-app.get('/gadgets', (req, res) => {
-  res.json({ message: 'Gadgets list' });
-  // Or, if you want to render an HTML page:
-  // res.render('gadgets');
-});
-// Static Gadget Route Example
-app.get('/gadgets', (req, res) => {
-  const results = [
-    { gadget_name: 'Smartwatch', price: 199, functionality: 'Fitness Tracking' },
-    { gadget_name: 'VR Headset', price: 299, functionality: 'Virtual Reality Experience' },
-    { gadget_name: 'Drone', price: 499, functionality: 'Aerial Photography' }
-  ];
-  res.render('gadgets', { results }); // Pass results to Pug
-});
-
-// Resource Route
-app.get('/resource', (req, res) => {
-  res.send('Resource page');
-});
-
-// Gadgets Route - Fetch from Database
-app.get('/resource/gadgets', async (req, res) => {
+// Route to fetch gadgets
+app.get('/gadgets', async (req, res) => {
   try {
-    // Fetch all gadgets from the database
-    const gadgets = await Gadget.find();
-    res.json(gadgets); // Send gadgets as JSON
+    const gadgets = await Gadget.find(); // Fetch all gadgets
+    const gadgetNames = gadgets.map(gadget => gadget.gadget_name); // Get gadget names
+    res.status(200).json(gadgetNames); // Return the list of gadget names
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to fetch gadgets" });
+    res.status(500).json({ message: 'Failed to fetch gadgets' });
   }
 });
 
-// POST Route for Creating Gadgets
+// Route to create gadgets (POST request to /resource/gadgets)
 app.post('/resource/gadgets', async (req, res) => {
   try {
     const newGadget = new Gadget(req.body);
@@ -89,15 +73,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error'); // Render error page
 });
-
-// MongoDB connection setup
-require('dotenv').config();
-const mongoose = require('mongoose');
-const connectionString = process.env.MONGO_CON;
-
-mongoose.connect(connectionString)
-  .then(() => console.log("Connection to DB succeeded"))
-  .catch((error) => console.error("MongoDB connection error:", error));
-
 
 module.exports = app;
