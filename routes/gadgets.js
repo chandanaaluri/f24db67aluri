@@ -2,7 +2,7 @@
 var express = require('express');
 var router = express.Router();
 const gadget_controlers = require('../controllers/gadgets'); // Adjust the path as necessary
-const Gadget = require('../models/gadget');
+const Gadget = require('../models/gadgets');
 
 // POST route to create a new gadget
 router.post('/', gadget_controlers.gadget_create_post);
@@ -13,8 +13,8 @@ router.get('/gadgets', async (req, res) => {
       
       // Map the results to format the response with custom id
       const formattedGadgets = gadgets.map(gadget => ({
-        id: gadget._id, // MongoDB's _id is renamed to 'id'
-        name: gadget.name,
+        id: gadget._id.toString(), // MongoDB's _id is renamed to 'id'
+        name: gadget.gadget_name,
         price: gadget.price,
         functionality: gadget.functionality
       }));

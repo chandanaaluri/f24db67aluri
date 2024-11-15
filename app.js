@@ -9,7 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const gridRouter = require('./routes/grid');
 const pickRouter = require('./routes/pick');
-
+const gadgetRouter = require('./routes/gadgets'); 
 var app = express();
 
 // View engine setup
@@ -27,7 +27,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/grid', gridRouter);
 app.use('/selector', pickRouter);
-
+app.use('/', gadgetRouter);
 // MongoDB connection setup
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -49,8 +49,7 @@ app.get('/gadgets', async (req, res) => {
   }
 });
 
-// Route to create gadgets (POST request to /resource/gadgets)
-// Route to create gadgets (POST request to /gadgets)
+
 app.post('/gadgets', (req, res) => {
   const gadget = req.body;
   console.log('Gadget received:', gadget);
