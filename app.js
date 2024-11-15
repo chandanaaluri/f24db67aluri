@@ -33,10 +33,17 @@ var resourceRouter = require('./routes/resource'); // Ensure this path is correc
 
 app.use('/resource', resourceRouter);  // Route for all resource-related requests
 
-app.get('/gadgets', (req, res) => {
-  res.json({ message: 'Gadgets list' });
-  // Or, if you want to render an HTML page:
-  // res.render('gadgets');
+app.get('/gadgets', async (req, res) => {
+  try {
+    // Fetch all gadgets from the database
+    const gadgets = await Gadget.find();
+    // Return the gadgets list as JSON
+    res.status(200).json(gadgets);
+  } catch (err) {
+    // Handle any errors (e.g., database connection issues)
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch gadgets' });
+  }
 });
 // Static Gadget Route Example
 app.get('/gadgets', (req, res) => {
