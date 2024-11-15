@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 const gridRouter = require('./routes/grid');
 const pickRouter = require('./routes/pick');
 const Gadget = require('./models/gadgets');
+const gadget_controller = require('./controllers/gadgets');  // Adjust according to your path
 
 var app = express();
 
