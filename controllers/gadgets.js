@@ -12,11 +12,22 @@ exports.gadget_list = async (req, res) => {
 };
 
 // Get a specific Gadget by ID
-exports.gadget_detail = function(req, res) {
-  Gadget.findById(req.params.id, function(err, gadget) {
-    if (err || !gadget) return res.status(404).json({ message: "Gadget not found" });
-    res.status(200).json(gadget);
-  });
+exports.gadget_detail = async function(req, res) {
+  console.log("Fetching gadget with ID: " + req.params.id);
+  try {
+    // Find the gadget by its ID
+    const result = await Gadget.findById(req.params.id);
+    // If gadget is found, send it as the response
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      // If not found, return a 404 error with a custom message
+      res.status(404).json({ message: `Gadget with ID ${req.params.id} not found` });
+    }
+  } catch (error) {
+    // Handle any errors (e.g., invalid ID format)
+    res.status(500).json({ message: `Error fetching gadget with ID ${req.params.id}` });
+  }
 };
 
 // Create a new Gadget
@@ -43,9 +54,30 @@ exports.gadget_delete = function(req, res) {
 };
 
 // Update a Gadget by ID
-exports.gadget_update_put = function(req, res) {
-  Gadget.findByIdAndUpdate(req.params.id, req.body, { new: true }, function(err, updatedGadget) {
-    if (err) return res.status(500).json({ message: "Error updating gadget" });
-    res.status(200).json(updatedGadget);
-  });
+// Controller for updating one gadget
+exports.gadget_update = async function(req, res) {
+  console.log("Updating gadget with ID: " + req.params.id);
+  try {
+    // Find the gadget by ID and update it
+    const gadget = await Gadget.findById(req.params.id);
+
+    if (!gadget) {
+      return res.status(404).json({ message: `Gadget with ID ${req.params.id} not found` });
+    }
+
+    // Update the gadget fields from the request body
+    if (req.body.name) gadget.name = req.body.name;
+    if (req.body.brand) gadget.brand = req.body.brand;
+    if (req.body.memory) gadget.memory = req.body.memory;
+    if (req.body.price) gadget.price = req.body.price;
+    // Add more fields as needed
+
+    // Save the updated gadget
+    await gadget.save();
+    res.status(200).json({ message: `Gadget with ID ${req.params.id} updated`, gadget });
+  } catch (error) {
+    // Handle any errors during update
+    res.status(500).json({ message: `Error updating gadget with ID ${req.params.id}` });
+  }
 };
+

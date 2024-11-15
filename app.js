@@ -71,7 +71,7 @@ app.get('/resource/gadgets', async (req, res) => {
     res.status(500).json({ message: "Failed to fetch gadgets" });
   }
 });
-
+router.get('/gadgets/:id', gadget_controller.gadget_detail);
 // POST Route for Creating Gadgets
 // POST Route for Creating Gadgets (updated to /gadgets)
 app.post('/gadgets', async (req, res) => {
