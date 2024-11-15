@@ -80,4 +80,25 @@ exports.gadget_update = async function(req, res) {
   }
 };
 
+exports.get_all_gadgets = async function(req, res) {
+  try {
+    // Fetching all gadgets from the database and selecting the fields (name, price, functionality)
+    const gadgets = await Gadget.find({}, 'name price functionality');
+
+    // Formatting the results with the id field
+    const formattedGadgets = gadgets.map(gadget => ({
+      id: gadget._id,
+      name: gadget.name,
+      price: gadget.price,
+      functionality: gadget.functionality
+    }));
+
+    // Sending the formatted result as a JSON response
+    res.json(formattedGadgets);
+  } catch (error) {
+    // If there is an error, send a response with the error message
+    res.status(500).send(`{"error": "${error.message}"}`);
+  }
+};
+
 
