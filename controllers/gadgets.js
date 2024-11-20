@@ -42,16 +42,20 @@ exports.gadget_create_post = async (req, res) => {
 
 // Delete a gadget by ID
 exports.gadget_delete = async function (req, res) {
+  console.log("delete " + req.params.id);
   try {
-    const gadget = await Gadget.findByIdAndDelete(req.params.id);
-    if (!gadget) {
-      return res.status(404).json({ message: 'Gadget not found' });
-    }
-    res.status(204).send();
+      const result = await Gadget.findByIdAndDelete(req.params.id);
+      if (!result) {
+          res.status(404).send({ message: `Gadget with ID ${req.params.id} not found` });
+      } else {
+          console.log("Removed " + result);
+          res.status(200).send(result);
+      }
   } catch (err) {
-    res.status(500).json({ message: 'Error deleting gadget' });
+      res.status(500).send({ error: `Error deleting gadget: ${err.message}` });
   }
 };
+
 
 // Update a gadget by ID
 exports.gadget_update = async function (req, res) {
