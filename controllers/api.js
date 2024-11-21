@@ -1,4 +1,3 @@
-
 exports.api = function(req, res) {
   res.write('[');
   res.write('{"resource":"galaxies", ');

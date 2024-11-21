@@ -1,24 +1,15 @@
+extends layout
+
 block content
-  h1 Lab 10
-  p Made changes to index.pug file
-
-  // Button with onclick attribute to call boost() function
-  button(type="button", class="btn btn-secondary", onclick="boost()") Press Me
-
-  // Add the div with id "boost" and initial text "add in extra"
-  div#boost add in extra
-
-  // JavaScript block to define variables and function
+  h1 Welcome to vinay's web pages
+  p This is a sample web page with an interactive button.
+  button(type="button", class="btn btn-secondary", onclick="boost()") Sample Button
+  div#boost Add in extra
   script.
     let value = 0;
     let amt = 3;
-
     function boost() {
       amt += 1;
       value += amt;
       document.getElementById('boost').innerText = `Boosted ${value} by ${amt}`;
     }
-
-  // Link to view gadgets
-  a(href="/gadgets",class="btn btn-primary") View Gadgets
-
