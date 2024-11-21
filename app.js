@@ -1,45 +1,50 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var Gadget = require('./models/gadgets'); // Import Gadget model
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+require('dotenv').config();
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-const gridRouter = require('./routes/grid');
-const pickRouter = require('./routes/pick');
-const gadgetRouter = require('./routes/gadgets'); 
+const mongoose = require('mongoose');
+const connectionString = process.env.MONGO_CON;
 
-var app = express();
+// Establish MongoDB connection with better error handling
+mongoose.connect(connectionString, { 
+  useNewUrlParser: true, 
+  useUnifiedTopology: true 
+})
+  .then(() => console.log("Connected to DB successfully"))
+  .catch((err) => {
+    console.error("MongoDB connection error:", err.message);
+    process.exit(1); // Exit the application if the connection fails
+  });
+
+// Import routes
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const resourceRouter = require('./routes/resource');
+const galaxiesRouter = require('./routes/galaxies'); // Ensure galaxies route is imported
+
+const app = express();
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-app.use(logger('dev'));
+// Middleware setup
+app.use(logger('dev')); 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Set up routes
+// Routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/grid', gridRouter);
-app.use('/selector', pickRouter);
-app.use('/gadgets', gadgetRouter);
+app.use('/resource', resourceRouter);
+app.use('/galaxies', galaxiesRouter);  // Ensure galaxies route is used
 
-// MongoDB connection setup
-require('dotenv').config();
-const mongoose = require('mongoose');
-const connectionString = process.env.MONGO_CON;
-
-mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connection to DB succeeded"))
-  .catch((error) => console.error("MongoDB connection error:", error));
-
-// Catch-all route to handle 404 errors
+// Catch 404 and forward to error handler
 app.use((req, res, next) => {
   next(createError(404));
 });
