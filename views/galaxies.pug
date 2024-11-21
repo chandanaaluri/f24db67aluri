@@ -1,32 +1,10 @@
 extends layout
 
 block content
-  h1 
-    if isSingle
-      | Galaxy Detail
-    else
-      | Search Results - Galaxies
-
-  .container-fluid
-    .row
-      // Ensure results exist and iterate through them
-      if results && results.length > 0
-        each galaxy in results
-          .col-sm-2(onclick=`inspect('${galaxy._id}')`)
-            h3 #{galaxy.name}
-            p Year: #{galaxy.year}
-            p Inventor: #{galaxy.inventor}
-            p Distance: #{galaxy.distance} light-years
-            p Type: #{galaxy.type}
-      else
-        p No galaxies found.
-
-  // Back to Home link
-  a(href='/') Back to Home
-
-  // Script for the click functionality
-  script.
-    function inspect(id) {
-      alert(`Inspecting Galaxy ID: ${id}`);
-      window.location.href = `/galaxies/${id}`;  // Redirect to galaxy details
-    }
+  h1 Galaxies
+  if message
+    p= message
+  else
+    ul
+      each galaxy in results
+        li= galaxy.name
