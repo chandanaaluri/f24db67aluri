@@ -1,9 +1,11 @@
-// controllers/api.js
+
 exports.api = function(req, res) {
-    res.status(200).json({
-      resources: [
-        { resource: 'gadgets', verbs: ['GET', 'POST', 'PUT', 'DELETE'] }
-      ]
-    });
-  };
+  res.write('[');
+  res.write('{"resource":"galaxies", ');
+  res.write(' "verbs":["GET","PUT", "DELETE"] ');
+  res.write('}');
+  res.write(']')
+  res.send();
+};
+
   

@@ -1,16 +1,25 @@
-const express = require('express');
-const router = express.Router();
-const apiController = require('../controllers/api');
-const gadgetController = require('../controllers/gadgets');
+var express = require('express');
+var router = express.Router();
 
-// API Route
-router.get('/', apiController.api);
+var api_controller = require('../controllers/api');
+var galaxy_controller = require('../controllers/galaxies');
 
-// Gadget Routes
-router.get('/gadgets', gadgetController.gadget_list);
-router.post('/gadgets', gadgetController.gadget_create_post);
-router.get('/gadgets/:id', gadgetController.gadget_detail);
-router.put('/gadgets/:id', gadgetController.gadget_update);
-router.delete('/gadgets/:id', gadgetController.gadget_delete);
+// Root route for API documentation or overview
+router.get('/', api_controller.api);
+
+// Create a new galaxy
+router.post('/galaxies', galaxy_controller.galaxy_create_post);
+
+// Delete a galaxy by ID
+router.delete('/galaxies/:id', galaxy_controller.galaxy_delete);
+
+// Update a galaxy by ID
+router.put('/galaxies/:id', galaxy_controller.galaxy_update_put);
+
+// Get details of a specific galaxy by ID
+router.get('/galaxies/:id', galaxy_controller.galaxy_detail);
+
+// Get a list of all galaxies
+router.get('/galaxies', galaxy_controller.galaxy_list);
 
 module.exports = router;
