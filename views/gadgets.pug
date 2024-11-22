@@ -3,8 +3,11 @@ extends layout
 block content
   h1= title
   each gadget in results
-    h3 Name: #{gadget.name}
-    li Brand: #{gadget.brand}
-    li Price: $#{gadget.price}
-    li Features: #{gadget.features}
-    li Warranty: #{gadget.warranty}
+    div.gadget-item
+      h3 Name: #{gadget.name}
+      ul
+        li Brand: #{gadget.brand}
+        li Price: $#{gadget.price}
+        li Features: #{gadget.features}
+        li Warranty: #{gadget.warranty}
+      a.btn.btn-primary(href=`/update/${gadget._id}`) Update
