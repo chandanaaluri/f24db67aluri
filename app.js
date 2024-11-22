@@ -1,106 +1,79 @@
-// app.js
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
 require('dotenv').config();
-
-const connectionString = process.env.MONGO_CON;
-
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 const mongoose = require('mongoose');
 
+// MongoDB Connection
+const connectionString = process.env.MONGO_CON;
 mongoose.connect(connectionString);
-
-var db = mongoose.connection;
-
-// Bind connection to error event
+const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once("open", function(){
-  console.log("Connection to DB succeeded")
+db.once('open', () => {
+  console.log("Connection to DB succeeded");
 });
 
-// Route imports
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const gridRouter = require('./routes/grid');
-const pickRouter = require('./routes/pick');
+// Initialize app
+var app = express();
+
+// Routers
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var gridRouter = require('./routes/grid');
+var pickRouter = require('./routes/pick');
+const Gadget = require('./models/gadget'); // Updated model
 const resourceRouter = require('./routes/resource');
-const galaxiesRouter = require('./routes/galaxies');  // Changed from inventionsRouter to galaxiesRouter
+var gadgetsRouter = require('./routes/gadgets'); // Updated router
 
-// Schema definition
-const galaxySchema = new mongoose.Schema({
-  name: String,
-  year: Number,
-  discoverer: String  // Changed from inventor to discoverer
-});
-
-const Galaxy = mongoose.models.Galaxy || mongoose.model('Galaxy', galaxySchema);
-
-// Database seeding function
-async function recreateDB() {
-  await Galaxy.deleteMany();
-  
-  let instance1 = new Galaxy({ name: 'Milky Way', year: 13.8, discoverer: 'Unknown' });
-  let instance2 = new Galaxy({ name: 'Andromeda', year: 2.537, discoverer: 'Unknown' });
-  let instance3 = new Galaxy({ name: 'Triangulum', year: 3.0, discoverer: 'Unknown' });
-
-  await instance1.save().then(doc => {
-    console.log("First object saved:", doc);
-  }).catch(err => {
-    console.error(err);
-  });
-
-  await instance2.save().then(doc => {
-    console.log("Second object saved:", doc);
-  }).catch(err => {
-    console.error(err);
-  });
-
-  await instance3.save().then(doc => {
-    console.log("Third object saved:", doc);
-  }).catch(err => {
-    console.error(err);
-  });
-}
-
-let reseed = true;
-if (reseed) {
-  recreateDB();
-}
-
-// Express app setup
-const app = express();
-
-// View engine setup
+// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-// Middleware
+// Middleware setup
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
+// Use routers
+app.use('/gadgets', gadgetsRouter); // Updated router
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/galaxies', galaxiesRouter);  // Changed from /inventions to /galaxies
 app.use('/grid', gridRouter);
-app.use('/selector', pickRouter);
+app.use('/randomitem', pickRouter);
 app.use('/resource', resourceRouter);
 
-// Error handling
+// catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
+// Error handler
 app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+
   res.status(err.status || 500);
   res.render('error');
 });
+
+// Recreate DB with sample data
+async function recreateDB() {
+  await Gadget.deleteMany();
+
+  const gadget1 = new Gadget({ name: "Smartphone", brand: "Samsung", price: 799, features: "Touchscreen, Camera", warranty: "2 years" });
+  const gadget2 = new Gadget({ name: "Laptop", brand: "Apple", price: 1299, features: "Retina Display, M1 Chip", warranty: "1 year" });
+  const gadget3 = new Gadget({ name: "Smartwatch", brand: "Fitbit", price: 199, features: "Heart Rate Monitor, GPS", warranty: "1 year" });
+
+  gadget1.save().then(doc => console.log("First gadget saved:", doc)).catch(console.error);
+  gadget2.save().then(doc => console.log("Second gadget saved:", doc)).catch(console.error);
+  gadget3.save().then(doc => console.log("Third gadget saved:", doc)).catch(console.error);
+}
+
+const reseed = true;
+if (reseed) { recreateDB(); }
 
 module.exports = app;

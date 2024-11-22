@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+  if (toShow == null)
+    h2 No instance to delete
+  else
+    - let gadgetid = toShow._id
+    - let name = toShow.name
+    - let brand = toShow.brand
+    - let year_released = toShow.year_released
+    form(action='/resource/gadgets/'+gadgetid, method='post')
+      input(type='hidden', name='_method', value='DELETE')
+      p= 'Are you sure you want to delete ' + name + '?'
+      button(type='submit') Delete

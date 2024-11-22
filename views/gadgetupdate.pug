@@ -1,0 +1,48 @@
+extends layout
+
+block content
+    h1= title
+    - let gadgetId = toShow._id
+    - let gadgetName = toShow.name
+    - let brand = toShow.brand
+    - let price = toShow.price
+
+    div.row(class='mb-2')
+        div.mr-1 ID is:
+        div #{gadgetId}
+
+    // Prepare the form for updating the gadget
+    - let actionId = "/resource/gadgets/" + gadgetId
+    form(id='GadgetForm', action=actionId, method="PUT")
+        div.form-group
+            label(for='name') Gadget Name
+            input#name(type='text', name='name', value=gadgetName)
+
+        div.form-group
+            label(for='brand') Brand
+            input#brand(type='text', name='brand', value=brand)
+
+        div.form-group
+            label(for='price') Price
+            input#price(type='number', name='price', value=price)
+
+        input(type="submit")
+
+    // Client-side script to intercept form submission
+    script.
+        document.forms['GadgetForm'].addEventListener('submit', (event) => {
+            event.preventDefault();
+            // Show user that form is being submitted
+            fetch(event.target.action, {
+                method: 'PUT',
+                body: new URLSearchParams(new FormData(event.target)) // Form data
+            }).then((resp) => {
+                return resp.json(); // Expecting a JSON response
+            }).then((body) => {
+                alert("Update succeeded");
+                // Optionally handle response body
+            }).catch((error) => {
+                alert("Update failed " + error);
+                // Handle error
+            });
+        });

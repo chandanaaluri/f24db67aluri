@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  h1= title
+  - let gadgetId = toShow._id
+  - let gadgetName = toShow.name
+  - let gadgetBrand = toShow.brand
+  - let gadgetPrice = toShow.price
+  - let gadgetSpecs = toShow.specifications
+
+  div
+    div.row
+      div(class='gadgetAttr mr-3') Gadget ID:
+      div #{gadgetId}
+    div.row
+      div(class='gadgetAttr mr-3') Gadget Name:
+      div #{gadgetName}
+    div.row
+      div(class='gadgetAttr mr-3') Brand:
+      div #{gadgetBrand}
+    div.row
+      div(class='gadgetAttr mr-3') Price:
+      div #{gadgetPrice}
+    div.row
+      div(class='gadgetAttr mr-3') Specifications:
+      div #{gadgetSpecs}
