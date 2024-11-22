@@ -13,3 +13,12 @@ block content
       value += amt;
       document.getElementById('boost').innerText = `Boosted ${value} by ${amt}`;
     }
+if (!user)
+a(href="/login") Login
+br
+a(href="/register") Register
+if (user)
+p You are currently logged in as #{user.username}
+a(href="/gadget") Take me to gadgets
+br
+a(href="/logout") Logout
