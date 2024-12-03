@@ -1,110 +1,137 @@
-require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables from .env file
 
-// MongoDB Connection
-const connectionString = process.env.MONGO_CON;
-mongoose.connect(connectionString);
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-  console.log("Connection to DB succeeded");
-});
-
-// Initialize app
-var app = express();
-
-// Routers
+// Routes imports
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var gridRouter = require('./routes/grid');
+var gadgetsRouter = require('./routes/gadgets');  
 var pickRouter = require('./routes/pick');
-const Gadget = require('./models/gadget'); // Updated model
-const resourceRouter = require('./routes/resource');
-var gadgetsRouter = require('./routes/gadgets'); // Updated router
+var resourceRouter = require('./routes/resource');  
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// MongoDB imports
+const mongoose = require('mongoose');
 
-// Middleware setup
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Use routers
-app.use('/gadgets', gadgetsRouter); // Updated router
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/grid', gridRouter);
-app.use('/randomitem', pickRouter);
-app.use('/resource', resourceRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+mongoose.connect('mongodb+srv://chandanaaluri05:Chandana2003*@cluster0.ezt2y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+  serverSelectionTimeoutMS: 10000,
+}).then(() => {
+  console.log('Connected to MongoDB Atlas');
+}).catch((err) => {
+  console.error('Database connection error:', err);
 });
 
-// Error handler
-app.use(function(err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-// Recreate DB with sample data
-async function recreateDB() {
-  await Gadget.deleteMany();
-
-  const gadget1 = new Gadget({ name: "Smartphone", brand: "Samsung", price: 799, features: "Touchscreen, Camera", warranty: "2 years" });
-  const gadget2 = new Gadget({ name: "Laptop", brand: "Apple", price: 1299, features: "Retina Display, M1 Chip", warranty: "1 year" });
-  const gadget3 = new Gadget({ name: "Smartwatch", brand: "Fitbit", price: 199, features: "Heart Rate Monitor, GPS", warranty: "1 year" });
-
-  gadget1.save().then(doc => console.log("First gadget saved:", doc)).catch(console.error);
-  gadget2.save().then(doc => console.log("Second gadget saved:", doc)).catch(console.error);
-  gadget3.save().then(doc => console.log("Third gadget saved:", doc)).catch(console.error);
-}
-
-const reseed = true;
-if (reseed) { recreateDB(); }
+// Gadget model import (replacing Artifact model)
+const Gadget = require("./models/gadget");
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy(
-function(username, password, done) {
-Account.findOne({ username: username })
-.then(function (user){
-if (err) { return done(err); }
-if (!user) {
-return done(null, false, { message: 'Incorrect username.' });
-}
-if (!user.validPassword(password)) {
-return done(null, false, { message: 'Incorrect password.' });
-}
-return done(null, user);
-})
-.catch(function(err){
-return done(err)
-})
-})
-)
+  function (username, password, done) {
+    Account.findOne({ username: username })
+      .then(function (user) {
+        if (err) { return done(err); }
+        if (!user) {
+          return done(null, false, { message: 'Incorrect username.' });
+        }
+        if (!user.validPassword(password)) {
+          return done(null, false, { message: 'Incorrect password.' });
+        }
+        return done(null, user);
+      })
+      .catch(function (err) {
+        return done(err)
+      })
+  })
+);
+
+var app = express();
+
+// MongoDB connection setup
+
+// Middleware setup
+app.use(logger('dev'));
+app.use(express.json());  // Add body parser middleware to handle JSON payload
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(require('express-session')({
-secret: 'keyboard cat',
-resave: false,
-saveUninitialized: false
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-var Account =require('./models/account');
+
+app.use(express.static(path.join(__dirname, 'public')));
+// View engine setup (pug)
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+// Routes setup
+app.use('/resource', resourceRouter);  // API for resource routes
+app.use('/grid', gridRouter);  // Route for /grid
+app.use('/gadgets', gadgetsRouter);  // Updated route for /gadgets
+app.use('/pick', pickRouter);  // Route for /pick
+app.use('/', indexRouter);  // Route for the homepage
+app.use('/users', usersRouter);  // Route for users
+
+// passport config
+// Use the existing connection
+// The Account model 
+var Account = require('./models/account');
 passport.use(new LocalStrategy(Account.authenticate()));
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
+
+// Error handler for 404
+app.use(function (req, res, next) {
+  next(createError(404));
+});
+
+// General error handler
+app.use(function (err, req, res, next) {
+  // Set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // Render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+let reseed = true;  // Set to false to prevent reseeding
+if (reseed) {
+  async function recreateDB() {
+    await Gadget.deleteMany();  // Delete all existing gadgets from the database
+
+    // New gadget data
+    const gadgets = [
+      { name: "Smartphone", brand: "Samsung", price: 799, features: "Touchscreen, Camera", warranty: "2 years" },
+      { name: "Laptop", brand: "Apple", price: 1299, features: "Retina Display, M1 Chip", warranty: "1 year" },
+      { name: "Smartwatch", brand: "Fitbit", price: 199, features: "Heart Rate Monitor, GPS", warranty: "1 year" }
+    ];
+
+    // Saving gadgets data to the database
+    gadgets.forEach(async (gadgetData) => {
+      const gadget = new Gadget(gadgetData);
+      await gadget.save();
+      console.log(`${gadget.name} saved to database.`);
+    });
+
+    console.log("Database seeded with gadgets!");
+  }
+  recreateDB();
+}
+
+// MongoDB Connection Status
+mongoose.connection.on('connected', () => {
+  console.log('Connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error(`MongoDB connection error: ${err}`);
+});
+
 module.exports = app;
