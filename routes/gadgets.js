@@ -1,15 +1,28 @@
-const express = require('express');
-const router = express.Router();
-const gadgetController = require('../controllers/gadget');
+// routes/gadgets.js
+var express = require('express');
+var router = express.Router();
+const secured = (req, res, next) => {
+    if (req.user) {
+        return next();
+    } 
+    res.redirect("/login");
+}
 
-// Route to view all gadgets in a web page
-router.get('/', gadgetController.gadget_view_all_Page);
+// Import the gadgets controller (make sure the file path is correct)
+const gadgetsController = require('../controllers/gadget'); // Updated to gadgets controller
 
-// Route to render a form for creating a new gadget
-router.get('/create', (req, res) => res.render('gadget_create_form'));
+router.get('/', gadgetsController.gadget_view_all_Page);  // Changed to gadget
+// GET request for one gadget
+router.get('/gadget/:id', gadgetsController.gadget_detail); // Changed to gadget
+/* GET detail gadget page */
+router.get('/detail', gadgetsController.gadget_view_one_Page); // Changed to gadget
+// DELETE request to delete a gadget by ID
+router.delete('/gadget/:id', gadgetsController.gadget_delete); // Changed to gadget
+/* GET create gadget page */
+router.get('/create', secured, gadgetsController.gadget_create_Page); // Changed to gadget
+/* GET update gadget page */
+router.get('/update', secured, gadgetsController.gadget_update_Page); // Changed to gadget
+/* GET delete gadget page */
+router.get('/delete', secured, gadgetsController.gadget_delete_Page); // Changed to gadget
 
-// Route to delete a gadget
-router.get('/delete', gadgetController.gadget_delete_Page);
-
-// Export the router
 module.exports = router;

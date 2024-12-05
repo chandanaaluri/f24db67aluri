@@ -2,12 +2,34 @@ extends layout
 
 block content
   h1= title
+  // Add a "Create New Gadget" button at the top
+  a.btn.btn-success.mb-3(href='/gadgets/create') Create New Gadget
+
+  // Loop through the gadgets in the collection
   each gadget in results
-    div.gadget-item
+    div.gadget-item(class="card my-2 p-2 border")
       h3 Name: #{gadget.name}
       ul
-        li Brand: #{gadget.brand}
-        li Price: $#{gadget.price}
-        li Features: #{gadget.features}
-        li Warranty: #{gadget.warranty}
-      a.btn.btn-primary(href=`/update/${gadget._id}`) Update
+        li <b>Brand:</b> #{gadget.brand}
+        li <b>Price:</b> $#{gadget.price}
+        li <b>Features:</b> #{gadget.features}
+        li <b>Warranty:</b> #{gadget.warranty}
+      
+      // Buttons to navigate to the update, details, and delete pages
+      a.btn.btn-primary.mt-2(href=`/gadgets/update/${gadget._id}`) Update
+      a.btn.btn-warning.mt-2(href=`/gadgets/detail?id=${gadget._id}`) View Details
+      a.btn.btn-danger.mt-2(href=`/gadgets/delete?id=${gadget._id}`) Delete
+
+  // Add a script to handle navigation (optional)
+  script.
+    function navigateToUpdate(gadgetId) {
+      window.location.href = `/gadgets/update?id=${gadgetId}`;
+    }
+
+    function navigateToDetails(gadgetId) {
+      window.location.href = `/gadgets/detail?id=${gadgetId}`;
+    }
+
+    function navigateToDelete(gadgetId) {
+      window.location.href = `/gadgets/delete?id=${gadgetId}`;
+    }
